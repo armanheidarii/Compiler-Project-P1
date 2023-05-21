@@ -62,11 +62,11 @@ class BinaryOp : public Expr
 public:
   enum Operator
   {
-    Equal,
     Plus,
     Minus,
     Mul,
-    Div
+    Div,
+    Equal
   };
 
 private:
