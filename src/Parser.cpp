@@ -38,24 +38,29 @@ AST *Parser::parseCalc()
 
     return new typeDecl(Vars);
   }
-  
+
   if (Tok.is(Token::ident))
   {
+
     Expr *Left = new Factor(Factor::Ident, Tok.getText());
+
+    advance();
+    if (expect(Token::equal))
+      goto _error;
+
     BinaryOp::Operator Op = BinaryOp::Equal;
     Expr *E;
 
-    if (expect(Token::assign))
-      goto _error;
-
+    advance();
     E = parseExpr();
+
     if (expect(Token::eoi))
       goto _error;
 
     Left = new BinaryOp(Op, Left, E);
     return Left;
   }
-  
+
 _error:
   while (Tok.getKind() != Token::eoi)
     advance();
@@ -114,7 +119,7 @@ Expr *Parser::parseFactor()
       error();
     while (!Tok.isOneOf(Token::r_paren, Token::star,
                         Token::plus, Token::minus,
-                        Token::slash, Token::eoi))
+                        Token::slash, Token::equal, Token::eoi))
       advance();
   }
   return Res;
