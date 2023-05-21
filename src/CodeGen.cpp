@@ -43,13 +43,6 @@ namespace
 
       Tree->accept(*this);
 
-      FunctionType *CalcWriteFnTy =
-          FunctionType::get(VoidTy, {Int32Ty}, false);
-      Function *CalcWriteFn = Function::Create(
-          CalcWriteFnTy, GlobalValue::ExternalLinkage,
-          "calc_write", M);
-      Builder.CreateCall(CalcWriteFnTy, CalcWriteFn, {V});
-
       Builder.CreateRet(Int32Zero);
     }
 
@@ -75,9 +68,7 @@ namespace
       Value *Right = V;
       switch (Node.getOperator())
       {
-      case BinaryOp::Equal:
-        V = Builder.CreateStore(Right, Left);
-        break;
+
       case BinaryOp::Plus:
         V = Builder.CreateNSWAdd(Left, Right);
         break;
@@ -89,6 +80,15 @@ namespace
         break;
       case BinaryOp::Div:
         V = Builder.CreateSDiv(Left, Right);
+        break;
+      case BinaryOp::Equal:
+        V = Builder.CreateStore(Right, Left);
+        FunctionType *CalcWriteFnTy =
+            FunctionType::get(VoidTy, {Int32Ty}, false);
+        Function *CalcWriteFn = Function::Create(
+            CalcWriteFnTy, GlobalValue::ExternalLinkage,
+            "calc_write", M);
+        Builder.CreateCall(CalcWriteFnTy, CalcWriteFn, {V});
         break;
       }
     };
